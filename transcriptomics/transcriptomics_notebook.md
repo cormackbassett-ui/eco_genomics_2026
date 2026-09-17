@@ -6,13 +6,9 @@
 
 ------------------------------------------------------------------------
 
-## 9.16.2026 - Setting up lab notebook and learning markdown
+## 9.17.2026 - Learning basic commands in the VACC shell
 
--   Setting up transcriptomics notebook
-
--   Learn how to take notes in markdown
-
--   Push notes to github
+-   Figuring out cool commands to muck about in the VACC computing shell
 
 **Working Directory:**
 
@@ -38,11 +34,15 @@
 
 **Code:**
 
-\`\`\` r
-
-print("Hello World")
-
-\`\`\`
+```         
+/gfps/1/cl/biol3990 #how to get into class data set
+ll #long list
+ls short list
+zcat #look into a zip file. DON'T RUN it without 'piping' it to a head command!
+head -n #number of to display after a zcat
+-wc #number of lines in file
+history #shows all recent commands
+```
 
 **Table:**
 
@@ -55,10 +55,10 @@ print("Hello World")
 
 **Image:**
 
-![](images/markdown-syntax-cheatsheet.webp)
+![This was the work done in the VACC shell today!](file:///users/c/k/ckbasset/projects/eco_genomics_2026/images%20for%20notebook/9.17.2026%20VACC%20shell.png)
 
 **Notes/Observations:**
 
-jajaja
+The VACC shell interface looks really scary
 
 **Next Steps:**
