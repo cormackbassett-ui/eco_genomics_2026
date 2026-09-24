@@ -6,9 +6,10 @@
 
 ------------------------------------------------------------------------
 
-## 9.17.2026 - Learning basic commands in the VACC shell
+## 9.22.2026 - Continuing the Gene expression analysis tutorial
 
--   Figuring out cool commands to muck about in the VACC computing shell
+-   Figuring out how to set up our R working environment and copied the data to import itno DESeq2
+
 
 **Working Directory:**
 
@@ -35,13 +36,44 @@
 **Code:**
 
 ```         
-/gfps/1/cl/biol3990 #how to get into class data set
-ll #long list
-ls short list
-zcat #look into a zip file. DON'T RUN it without 'piping' it to a head command!
-head -n #number of to display after a zcat
--wc #number of lines in file
-history #shows all recent commands
+# mkdir("something") lets us make a new directory at whatever level we are in
+# countsTable will format a data packet for us into a chart
+# countsTable round will round the figures to the closest integer
+# hist(apply(countsTableRound,1,mean),xlim=c(0,1000), ylim=c(0,10000),breaks=10000) turns the data into a readable histogram to understand
+# dds <- DESeqDataSetFromMatrix(countData = countsTableRound, colData=conds, 
+                              design= ~ generation + treatment)
+# The above command let us create a DeSeq object and labe lit via the tilda
+# dds <- dds[rowSums(counts(dds) >= 15) >= 28,]
+# nrow(dds) 
+# Above command filtered out the genes for only those btween 15 and 28 strand longs!
+# dds <- DESeq(dds) This command runs a differential gene exrpession anaysis on the function
+# resultsNames(dds) This command spits out the names of what groups we just made
+# vsd <- vst(dds, blind=FALSE)
+# meanSdPlot(assay(vsd))
+# sampleDists <- dist(t(assay(vsd))) This whole section of commands bascially just tries to vet the data for variance and stabilizes it
+# 
+library("RColorBrewer")
+# sampleDistMatrix <- as.matrix(sampleDists)
+# rownames(sampleDistMatrix) <- paste(vsd$line, vsd$generation, sep="-")
+# colnames(sampleDistMatrix) <- NULL
+# colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+# pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+# This WHOOOLE section just sets up the histogram that allows us to analyze for outliers.
+# 
+sampleTree <- hclust(dist(sampleDists), method="average")
+# plot
+# plot(sampleTree, main="Sample clustering to detect outliers", sub="", xlab="",cex.lab=1.5, cex.axis=1.5, cex.main=2)
+# The above section lets us actually check for outliers!
+# 
+
+
+
+Principle Component Analysis collapses a matrix of different attributes to data into two separate axes to see how close data clusters are in relation to one another!
+# library ("something") will pull up that module for us to use in the R Studio time (like DeSeq2!)
+# 
 ```
 
 **Table:**
