@@ -1,8 +1,8 @@
 # Basic plan for the code is to reuse the WGCNA code provided to us in day 6, 
 # fiddle around with the soft threshold powers to create 3 separate sharpness
 #  contrasts in the data, pull out the differences in the number of modules, 
-# genes per module, and strength of correlation with traits, AND Go functional 
-# module for targeted traits - traits investigated by the 2023 DeMayo paper.
+# genes per module, and strength of correlation with traits
+# - traits investigated by the 2023 DeMayo paper.
 
 
 setwd("~/projects/eco_genomics_2026/transcriptomics")
@@ -33,8 +33,8 @@ countsTableRound <- round(countsTable) # bc DESeq2 doesn't like decimals (and Sa
 head(countsTableRound)
 
 #import the sample description table
-# conds <- read.delim("ahud_samples_R.txt", header=TRUE, stringsAsFactors = TRUE, row.names=1)
-# head(conds)
+conds <- read.delim("ahud_samples_R.txt", header=TRUE, stringsAsFactors = TRUE, row.names=1)
+head(conds)
 
 sample_metadata = read.table(file = "mydata/Ahud_trait_data.txt",header=T, row.names = 1)
 
@@ -162,353 +162,256 @@ bwnet_8 <- readRDS("bwnet.8.rds")
 
 cor <- temp_cor
 
-###Bwent with threshold of 4 
-module_eigengenes_4 <- bwnet_4$MEs
+module_eigengenes <- bwnet$MEs
 
-head(module_eigengenes_4)
+head(module_eigengenes)
 
-# Plot the dendrogram and the module colors before and after merging underneath
-plotDendroAndColors(bwnet_4$dendrograms[[1]], cbind(bwnet_4$unmergedColors, bwnet_4$colors),
-                    c("unmerged", "merged"),
-                    dendroLabels = FALSE,
-                    addGuide = TRUE,
-                    hang= 0.03,
-                    guideHang = 0.05)
 
-##All Together
-nets <- list("Power 4" = bwnet_4,
-             "Power 6" = bwnet_6,
-             "Power 8" = bwnet_8)
-
-# Function: dendrogram + unmerged/merged module colors
-plot_dendro <- function(net, title, block = 1) {
-  # genes belonging to this block (handles multi-block runs safely)
-  idx <- net$blockGenes[[block]]
-  
-  plotDendroAndColors(
-    net$dendrograms[[block]],
-    cbind(net$unmergedColors[idx], net$colors[idx]),
-    groupLabels = c("Unmerged", "Merged"),
-    dendroLabels = FALSE,
-    hang = 0.03,
-    addGuide = TRUE,
-    guideHang = 0.05,
-    main = paste("Gene Dendrogram and Module Colors -", title)
-  )
-}
-
-###Bwent with threshold of 6 ---------------------------------------------------------
-module_eigengenes_6 <- bwnet_6$MEs
-
-head(module_eigengenes_6)
-
-# get number of genes for each module
+# getting number of genes per module
+table(bwnet_4$colors)
+table(bwnet_6$colors)
 table(bwnet_6$colors)
 
 # Plot the dendrogram and the module colors before and after merging underneath
-plotDendroAndColors(bwnet_6$dendrograms[[1]], cbind(bwnet_6$unmergedColors, bwnet_6$colors),
+plotDendroAndColors(bwnet$dendrograms[[1]], cbind(bwnet$unmergedColors, bwnet$colors),
                     c("unmerged", "merged"),
                     dendroLabels = FALSE,
                     addGuide = TRUE,
                     hang= 0.03,
                     guideHang = 0.05)
-
-###Bwent with threshold of 8 ---------------------------------------------------------
-module_eigengenes_8 <- bwnet_8$MEs
-
-head(module_eigengenes_8)
-
-# get number of genes for each module
-table(bwnet_8$colors)
-
-# Plot the dendrogram and the module colors before and after merging underneath
-plotDendroAndColors(bwnet_8$dendrograms[[1]], cbind(bwnet_8$unmergedColors, bwnet_8$colors),
-                    c("unmerged", "merged"),
-                    dendroLabels = FALSE,
-                    addGuide = TRUE,
-                    hang= 0.03,
-                    guideHang = 0.05)
-
-#Stitching them together
-for (nm in names(nets)) {
-  png(paste0("dendrogram_", gsub(" ", "_", nm), ".png"),
-      width = 2400, height = 1200, res = 200)
-  plot_dendro(nets[[nm]], nm)
-  dev.off()
-}
-
-###Bwent with threshold of 4 ---------------------------------------------------------
-module_eigengenes_4 <- bwnet_4$MEs
-
-head(module_eigengenes_4)
-
-# Plot the dendrogram and the module colors before and after merging underneath
-plotDendroAndColors(bwnet_4$dendrograms[[1]], cbind(bwnet_4$unmergedColors, bwnet_4$colors),
-                    c("unmerged", "merged"),
-                    dendroLabels = FALSE,
-                    addGuide = TRUE,
-                    hang= 0.03,
-                    guideHang = 0.05)
-
-##All Together
-nets <- list("Power 4" = bwnet_4,
-             "Power 6" = bwnet_6,
-             "Power 8" = bwnet_8)
-
-# Function: dendrogram + unmerged/merged module colors
-plot_dendro <- function(net, title, block = 1) {
-  # genes belonging to this block (handles multi-block runs safely)
-  idx <- net$blockGenes[[block]]
-  
-  plotDendroAndColors(
-    net$dendrograms[[block]],
-    cbind(net$unmergedColors[idx], net$colors[idx]),
-    groupLabels = c("Unmerged", "Merged"),
-    dendroLabels = FALSE,
-    hang = 0.03,
-    addGuide = TRUE,
-    guideHang = 0.05,
-    main = paste("Gene Dendrogram and Module Colors -", title)
-  )
-}
-
-###Bwent with threshold of 6 ---------------------------------------------------------
-module_eigengenes_6 <- bwnet_6$MEs
-
-head(module_eigengenes_6)
-
-# get number of genes for each module
-table(bwnet_6$colors)
-
-# Plot the dendrogram and the module colors before and after merging underneath
-plotDendroAndColors(bwnet_6$dendrograms[[1]], cbind(bwnet_6$unmergedColors, bwnet_6$colors),
-                    c("unmerged", "merged"),
-                    dendroLabels = FALSE,
-                    addGuide = TRUE,
-                    hang= 0.03,
-                    guideHang = 0.05)
-
-###Bwent with threshold of 8 ---------------------------------------------------------
-module_eigengenes_8 <- bwnet_8$MEs
-
-head(module_eigengenes_8)
-
-# get number of genes for each module
-table(bwnet_8$colors)
-
-# Plot the dendrogram and the module colors before and after merging underneath
-plotDendroAndColors(bwnet_8$dendrograms[[1]], cbind(bwnet_8$unmergedColors, bwnet_8$colors),
-                    c("unmerged", "merged"),
-                    dendroLabels = FALSE,
-                    addGuide = TRUE,
-                    hang= 0.03,
-                    guideHang = 0.05)
-
-#Stitching them together
-for (nm in names(nets)) {
-  png(paste0("dendrogram_", gsub(" ", "_", nm), ".png"),
-      width = 2400, height = 1200, res = 200)
-  plot_dendro(nets[[nm]], nm)
-  dev.off()
-}
-
-
-install.packages("magick")
-library(magick)
-setwd("~/projects/eco_genomics_2026/transcriptomics/myimages")
-
-files <- c("Cluster_Dendrogram_4.png",
-           "Cluster_Dendrogram_6.png",
-           "Cluster_Dendrogram_8.png")
-
-imgs <- image_read(files)
-
-# Stack vertically (one above the other), which suits wide dendrograms
-stacked <- image_append(imgs, stack = TRUE)
-image_write(stacked, "dendrograms_stacked.png", format = "png")
-
-# View it
-print(stacked)
 
 
 setwd("~/projects/eco_genomics_2026/transcriptomics/mydata")
 
-###Stats for different thresholds
-#Number of modules
-length(unique(bwnet_4$colors)) 
-length(unique(bwnet_6$colors)) 
-length(unique(bwnet_8$colors))
+#Generating the comparison to power 4 from 6 and 8
 
-#Percentage of genes changing module assignment
-mean(bwnet_4$colors != bwnet_6$colors) 
-mean(bwnet_4$colors != bwnet_8$colors) 
-mean(bwnet_6$colors != bwnet_8$colors)
+library(WGCNA)
+library(ggplot2)
 
-#Module eigengene similarity
-cor(bwnet_4$MEs, bwnet_6$MEs)
-cor(bwnet_4$MEs, bwnet_8$MEs)
+# Make sure to debug this chunk of code, I think it's configured to set row count
+# as 0, which is annoying, but it still works, so interesting! 
+cor_df$Module <- sub("^ME", "", cor_df$Module)
 
-#Graph comparing eigengenes
-
-# Plot the dendrogram and the module colors before and after merging underneath
-plotDendroAndColors(bwnet_8$dendrograms[[1]], cbind(bwnet_8$unmergedColors, bwnet_8$colors),
-                    c("unmerged", "merged"),
-                    dendroLabels = FALSE,
-                    addGuide = TRUE,
-                    hang= 0.03,
-                    guideHang = 0.05)
-
-##All Together
-nets <- list("Power 4" = bwnet_4,
-             "Power 6" = bwnet_6,
-             "Power 8" = bwnet_8)
-
-# 1. Per-sample eigengene values
-p_me <- ggplot(me_long, aes(x = Sample, y = Eigengene, fill = Power)) +
-  geom_col(position = position_dodge(width = 0.9), width = 0.85) +
-  facet_wrap(~ Module, ncol = 1, scales = "free_y") +
-  theme_bw() +
-  labs(title = "Module eigengenes from WGCNA Soft Thresholds",
-       x = "Sample", y = "Eigengenes", fill = "Soft power") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 7))
-
-p_me
-
-ggsave("~/projects/eco_genomics_2026/transcriptomics/myimages/eigengene_values_by_power.png",
-       p_me, width = 14, height = 3 * length(shared), dpi = 200, limitsize = FALSE)
-
-# 2. How similar is each module's eigengene to power 4
-cor_df <- rbind(
-  data.frame(Module = shared,
-             Comparison = "Power 4 vs 6",
-             Correlation = sapply(shared, function(m) WGCNA::cor(ME6[[m]], ME4[[m]]))),
-  data.frame(Module = shared,
-             Comparison = "Power 4 vs 8",
-             Correlation = sapply(shared, function(m) WGCNA::cor(ME8[[m]], ME4[[m]])))
+# Plotting the two separate power comparisons
+correlation_df <- rbind(
+  data.frame(
+    Module     = shared_valid,
+    Comparison = "Power 6 vs 4", "Power 6 vs 4",
+    Correlation = sapply(shared_valid, function(m) {
+      cor(ME4[[m]], ME6[[m]])
+    })
+  ),
+  data.frame(
+    Module     = shared_valid,
+    Comparison = "Power 8 vs 4","Power 8 vs 4",
+    Correlation = sapply(shared_valid, function(m) {
+      cor(ME4[[m]], ME8[[m]])
+    })
+  )
 )
+
+# Cleaning up module genes
+
+
 cor_df$Module <- sub("^ME", "", cor_df$Module)
 
 p_cor <- ggplot(cor_df, aes(x = Module, y = abs(Correlation), fill = Comparison)) +
-  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
+  geom_col(position = position_dodge(width = 1.0), width = 0.75) +
   coord_cartesian(ylim = c(0, 1)) +
   theme_bw() +
-  labs(title = "Eigengene similarity to power 4",
-       x = "Modules", y = "Correlation of eigengenes") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  labs(
+    title = "Eigengene Module Similarity",
+    x = "Modules",
+    y = "Correlation"
+  ) +
+  theme(axis.text.x = element_text(angle = 50, hjust = 1))
 
 p_cor
 
-ggsave("~/projects/eco_genomics_2026/transcriptomics/myimages/eigengene_similarity_barplot.png",
+
+ggsave("~/projects/eco_genomics_2026/transcriptomics/myimages/Eigengene_Module_Similarity.png",
        p_cor, width = 10, height = 5, dpi = 250)
 
 
-# # of Genes across thresholds
 
-get_module_sizes <- function(colors, threshold) {
-  as.data.frame(table(colors)) |>
-    dplyr::rename(Module = colors, Count = Freq) |>
-    dplyr::mutate(Threshold = threshold)
-}
 
+# Creating the module size across WGCNA thresholds graph - make sure to debug
 df <- rbind(
-  get_module_sizes(bwnet_4$colors, "4"),
-  get_module_sizes(bwnet_6$colors, "6"),
-  get_module_sizes(bwnet_8$colors, "8")
+  as.data.frame(table(bwnet_colors)) %>%
+    
+    rename(Module = Var1, Count = Freq)%>%
+    mutate(Threshold = "4"),
+  
+  as.data.frame(table(bwnet_6$colors)) %>%
+    rename(Module = bwnet_6.colors, Count = Freq) %>%
+    mutate(Threshold = "6"),
+  
+  as.data.frame(table(bwnet_8$colors)) %>%
+    rename(Module = bwnet_8.colors, Count = Freq) %>%
+    mutate(Threshold = "8")
 )
 
-# Order modules by size at power 4 so the x-axis is easier to read
+#Actually buildign module size graph
 mod_order <- df$Module[df$Threshold == "4"][order(-df$Count[df$Threshold == "4"])]
-df$Module <- factor(df$Module, levels = unique(c(as.character(mod_order),
-                                                 as.character(df$Module))))
+df$Module <- factor(df$Module, levels = mod_order)
 
 p <- ggplot(df, aes(x = Module, y = Count, fill = Threshold)) +
-  geom_col(position = position_dodge2(preserve = "single"), width = 0.75) +
+  geom_col(width = 0.75) +
+  facet_wrap(~ Threshold, nrow = 1) +
   theme_bw() +
   labs(
-    title = "Module Size Across WGCNA Soft Thresholds",
+    title = "Different Module Size Across WGCNA Soft Thresholds",
     x = "Module Color",
-    y = "Gene Count",
-    fill = "Soft power"
+    y = "Gene Count"
   ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 p
 
-ggsave("~/projects/eco_genomics_2026/transcriptomics/myimages/module_sizes_barplot.png",
-       p, width = 12, height = 6, dpi = 250)
+ggsave("~/projects/eco_genomics_2026/transcriptomics/myimages/Different_Module_Size_Across_WGCNA_Soft_Thresholds.png",
+       p_cor, width = 10, height = 5, dpi = 250)
 
 
-###Visualizing module correlation
-library(pheatmap)
 
-#4 v 6
-corME_46 <- cor(bwnet_4$MEs,
-                bwnet_6$MEs)
+# SETTING UP HEATMAP FOR 6 YAYAAY (REMEMBER TO CHANGE THE DIRECTORY OR THIS WONT WORK AND UR COMPUTER EXPLODES)
 
-pheatmap(corME_46,
-         cluster_rows = TRUE,
-         cluster_cols = TRUE,
-         display_numbers = TRUE)
+# 6A. Relate modules to traits --------------------------------------------------
+# module trait associations
 
-#4 v 8
-corME_48 <- cor(bwnet_4$MEs,
-                bwnet_8$MEs)
-
-pheatmap(corME_48,
-         cluster_rows = TRUE,
-         cluster_cols = TRUE,
-         display_numbers = TRUE)
-
-##All together
-ME4 <- bwnet_4$MEs
-ME6 <- bwnet_6$MEs
-ME8 <- bwnet_8$MEs
-
-# Add prefixes so modules are identifiable
-colnames(ME4) <- paste0("P4_", colnames(ME4))
-colnames(ME6) <- paste0("P6_", colnames(ME6))
-colnames(ME8) <- paste0("P8_", colnames(ME8))
-
-# Combine eigengenes
-allMEs <- cbind(ME4, ME6, ME8)
-
-# Correlation matrix
-MEcor <- cor(allMEs)
+traits <- sample_metadata[, c(5,8,11,14,17)]
 
 
-pheatmap(
-  MEcor,
-  color = colorRampPalette(c("#E5F5F9", "#2CA25F", "#1A1A1A"))(100),
-  border_color = NA,
-  main = "Correlation Across Soft Threshold Powers"
-)
-
-#Clustering it
-pheatmap(
-  MEcor,
-  cluster_rows = TRUE,
-  cluster_cols = TRUE,
-  display_numbers = TRUE,
-  number_format = "%.2f",
-  color = colorRampPalette(c("#E5F5F9", "#2CA25F", "#1A1A1A"))(100)
-)
-
-#Gene Reassignment
-table46 <- table(
-  Power4 = bwnet_4$colors,
-  Power6 = bwnet_6$colors
-)
-
-table48 <- table(bwnet_4$colors,
-                 bwnet_8$colors)
-
-table68 <- table(bwnet_6$colors,
-                 bwnet_8$colors)
-
-pheatmap(log10(table46 + 5))
-pheatmap(log10(table48 + 5))
-pheatmap(log10(table68 + 5))
+# Define numbers of genes and samples
+nSamples <- nrow(norm.counts)
+nGenes <- ncol(norm.counts)
 
 
-ggsave("Correlation Across Soft Threshold Power.png",
-       p_cor, width = 12, height = 6, dpi = 250)
+module.trait.corr <- cor(module_eigengenes, traits, use = 'p')
+module.trait.corr.pvals <- corPvalueStudent(module.trait.corr, nSamples)
+
+
+
+# visualize module-trait association as a heatmap
+
+heatmap.data <- merge(module_eigengenes, traits, by = 'row.names')
+
+head(heatmap.data)
+
+heatmap.data <- heatmap.data %>% 
+  column_to_rownames(var = 'Row.names')
+
+
+names(heatmap.data)
+
+CorLevelPlot(heatmap.data,
+             x = names(heatmap.data)[12:16],
+             y = names(heatmap.data)[1:11],
+             col = c("blue1", "skyblue", "white", "pink", "red"))
+
+# SETTING UP 8 SOFT THRESHOLD HEATMAP YIPPEE HOORAYYYY
+
+
+soft_power <- 8 # should try running with 7 based on R^2
+temp_cor <- cor
+cor <- WGCNA::cor # use the 'cor' function from the WGCNA package
+
+
+
+saveRDS(bwnet, file = "bwnet.8.rds")
+
+bwnet <- readRDS("bwnet.8.rds")
+
+cor <- temp_cor
+plotDendroAndColors(bwnet$dendrograms[[1]], cbind(bwnet$unmergedColors, bwnet$colors),
+                   c("unmerged", "merged"),
+                   dendroLabels = FALSE,
+                   addGuide = TRUE,
+                   hang= 0.03,
+                   guideHang = 0.05)
+
+# grey module = all genes that doesn't fall into other modules were assigned to the grey module
+# with higher soft power, more genes fall into the grey module
+
+
+# 6A. Relate modules to traits --------------------------------------------------
+# module trait associations
+
+traits <- sample_metadata[, c(5,8,11,14,17)]
+
+
+# Define numbers of genes and samples
+nSamples <- nrow(norm.counts)
+nGenes <- ncol(norm.counts)
+
+
+module.trait.corr <- cor(module_eigengenes, traits, use = 'p')
+module.trait.corr.pvals <- corPvalueStudent(module.trait.corr, nSamples)
+
+
+# visualize module-trait association as a heatmap
+
+heatmap.data <- merge(module_eigengenes, traits, by = 'row.names')
+
+head(heatmap.data)
+
+heatmap.data <- heatmap.data %>% 
+  column_to_rownames(var = 'Row.names')
+
+
+names(heatmap.data)
+
+CorLevelPlot(heatmap.data,
+             x = names(heatmap.data)[12:16],
+             y = names(heatmap.data)[1:11],
+             col = c("blue1", "skyblue", "white", "pink", "red"))
+
+# CODE FOR 4 HEATMAP WAHOOO
+
+
+bwnet <- readRDS("bwnet.4.rds")
+
+cor <- temp_cor
+
+plotDendroAndColors(bwnet$dendrograms[[1]], cbind(bwnet$unmergedColors, bwnet$colors),
+                    c("unmerged", "merged"),
+                    dendroLabels = FALSE,
+                    addGuide = TRUE,
+                    hang= 0.03,
+                    guideHang = 0.05)
+
+# grey module = all genes that doesn't fall into other modules were assigned to the grey module
+# with higher soft power, more genes fall into the grey module
+
+
+# 6A. Relate modules to traits --------------------------------------------------
+# module trait associations
+
+traits <- sample_metadata[, c(5,8,11,14,17)]
+
+
+# Define numbers of genes and samples
+nSamples <- nrow(norm.counts)
+nGenes <- ncol(norm.counts)
+
+
+module.trait.corr <- cor(module_eigengenes, traits, use = 'p')
+module.trait.corr.pvals <- corPvalueStudent(module.trait.corr, nSamples)
+
+
+
+# visualize module-trait association as a heatmap
+
+heatmap.data <- merge(module_eigengenes, traits, by = 'row.names')
+
+head(heatmap.data)
+
+heatmap.data <- heatmap.data %>% 
+  column_to_rownames(var = 'Row.names')
+
+
+names(heatmap.data)
+
+CorLevelPlot(heatmap.data,
+             x = names(heatmap.data)[12:16],
+             y = names(heatmap.data)[1:11],
+             col = c("blue1", "skyblue", "white", "pink", "red"))
